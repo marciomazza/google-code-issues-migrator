@@ -5,6 +5,7 @@ import sys
 import re
 import logging
 import getpass
+import HTMLParser
 
 from datetime import datetime
 
@@ -140,6 +141,8 @@ def format_comment(comment):
     else: return "_From %s on %s_\n%s" % (author, date, content)
 
 
+htmlparser = HTMLParser.HTMLParser()
+html_unescape = htmlparser.unescape
 
 def add_issue_to_github(issue):
 
@@ -184,6 +187,10 @@ def add_issue_to_github(issue):
     # Add the new Github issue with its labels and a header identifying it as migrated
 
     github_issue = None
+
+    # for some strange reason we've got content doubly escaped
+    # (with things like "&amp;lt;")
+    content = html_unescape(html_unescape(content))
 
     header = "_Original author: %s (%s)_" % (author, date)
     footer = GOOGLE_ISSUE_TEMPLATE % link
@@ -353,6 +360,7 @@ def log_rate_info():
     logging.info( 'Rate limit (remaining/total) %s',repr(github.rate_limiting))
     # Note: this requires extended version of PyGithub from tfmorris/PyGithub repo
     #logging.info( 'Rate limit (remaining/total) %s',repr(github.rate_limit(refresh=True)))
+
     
 if __name__ == "__main__":
 
