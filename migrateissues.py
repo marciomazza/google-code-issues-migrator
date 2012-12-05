@@ -289,16 +289,16 @@ def process_gcode_issues(existing_issues):
                 while previous_gid + 1 < gid:
                     previous_gid += 1
                     output("Using dummy entry for missing issue %d\n" % (previous_gid ))
-                    title = "Google Code skipped issue %d" % (previous_gid )
-                    if previous_gid not in existing_issues:
-                        body = "_Skipping this issue number to maintain synchronization with Google Code issue IDs._"
-                        link = GOOGLE_URL % (google_project_name, previous_gid)
-                        footer = GOOGLE_ISSUE_TEMPLATE % link
-                        body += '\n\n' + footer
-                        github_issue = github_repo.create_issue(title, body = body, labels = [github_label("imported")])
-                        github_issue.edit(state = "closed")
-                        existing_issues[previous_gid]=github_issue
-                    
+                    if not options.dry_run:
+                        title = "Google Code skipped issue %d" % (previous_gid )
+                        if previous_gid not in existing_issues:
+                            body = "_Skipping this issue number to maintain synchronization with Google Code issue IDs._"
+                            link = GOOGLE_URL % (google_project_name, previous_gid)
+                            footer = GOOGLE_ISSUE_TEMPLATE % link
+                            body += '\n\n' + footer
+                            github_issue = github_repo.create_issue(title, body = body, labels = [github_label("imported")])
+                            github_issue.edit(state = "closed")
+                            existing_issues[previous_gid]=github_issue
 
             # Add the issue and its comments to Github, if we haven't already
 
